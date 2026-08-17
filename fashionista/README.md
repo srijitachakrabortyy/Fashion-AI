@@ -47,13 +47,13 @@ By fusing MediaPipe Semantic Selfie Segmentation, OpenCV Poisson Seamless Clonin
 
 ```mermaid
 graph TD
-    User([User / Web Browser]) <--> |HTTP / JSON REST API| Frontend[React.js + TypeScript Frontend\n(Vite + Tailwind CSS + HTML5 Canvas)]
-    Frontend <--> |REST API Requests| Backend[Python Flask Backend API Server\n(app.py)]
+    User["User / Web Browser"] <-->|HTTP / JSON REST API| Frontend["React.js + TypeScript Frontend<br/>(Vite + Tailwind CSS + Canvas)"]
+    Frontend <-->|REST API Requests| Backend["Python Flask Backend API Server<br/>(app.py)"]
     
-    subgraph AI & Computer Vision Engines
-        Backend <--> |Semantic Masking & Poisson Blend| MediaPipeCV[MediaPipe + OpenCV Engine\n(cv_engine.py)]
-        Backend <--> |TF-IDF & Cosine Similarity| ML[Scikit-Learn Recommender\n(ml_recommender.py)]
-        Backend <--> |PyMongo CRUD / Memory Store| DB[(MongoDB Database\n/ In-Memory Store)]
+    subgraph AIEngine ["AI & Computer Vision Engines"]
+        Backend <-->|Semantic Masking & Poisson Blend| MediaPipeCV["MediaPipe + OpenCV Engine<br/>(cv_engine.py)"]
+        Backend <-->|TF-IDF & Cosine Similarity| ML["Scikit-Learn Recommender<br/>(ml_recommender.py)"]
+        Backend <-->|PyMongo CRUD / Memory Store| DB[("MongoDB Database<br/>/ In-Memory Store")]
     end
 ```
 
@@ -63,28 +63,31 @@ graph TD
 
 ```mermaid
 flowchart TD
-    Webcam[Live OpenCV Webcam / User Photo] & Garment[Studio Outfit Base Canvas] --> Decode[Image Normalization & 600x800 Resizing]
+    Webcam["Live OpenCV Webcam / User Photo"] --> Decode["Image Normalization & 600x800 Resizing"]
+    Garment["Studio Outfit Base Canvas"] --> Decode
     
-    subgraph Face & Target Box Alignment
-        Garment --> DetectModel[Detect Model Head Coordinates\n'CascadeClassifier.detectMultiScale']
-        DetectModel --> TargetBox[Calculate Target Placement Box\nShifted Y-Offset for Hair Crown Coverage]
-        Webcam --> DetectUser[Detect User Head Region]
-        DetectUser --> CropUser[Crop Head, Hair & Chin Area]
+    subgraph Alignment ["Face & Target Box Alignment"]
+        Garment --> DetectModel["Detect Model Head Coordinates<br/>CascadeClassifier.detectMultiScale"]
+        DetectModel --> TargetBox["Calculate Target Placement Box<br/>Shifted Y-Offset for Hair Crown Coverage"]
+        Webcam --> DetectUser["Detect User Head Region"]
+        DetectUser --> CropUser["Crop Head, Hair & Chin Area"]
     end
     
-    subgraph Color Grading & Tone Matching
-        CropUser & Garment --> LAB[LAB Color Space Transformation\n'cv2.cvtColor BGR2LAB']
-        LAB --> ToneMatch[Luminance & Histogram Tone Matching\nMatch User Skin Tone to Studio Lighting]
+    subgraph ColorGrading ["Color Grading & Tone Matching"]
+        CropUser --> LAB["LAB Color Space Transformation<br/>cv2.cvtColor BGR2LAB"]
+        Garment --> LAB
+        LAB --> ToneMatch["Luminance & Histogram Tone Matching<br/>Match User Skin Tone to Studio Lighting"]
     end
 
-    subgraph Semantic Segmentation & Poisson Seamless Cloning
-        ToneMatch --> MediaPipeSeg[MediaPipe Selfie Segmentation\nExtract Head, Hair & Neck Alpha Mask]
-        MediaPipeSeg --> Gaussian[Gaussian Edge Blur Smoothing\nkernel = 45x45]
-        Gaussian & TargetBox --> Poisson[OpenCV Poisson Image Editing\n'cv2.seamlessClone NORMAL_CLONE']
-        Poisson --> Sharpen[Unsharp Mask Grain Harmonization]
+    subgraph Segmentation ["Semantic Segmentation & Poisson Seamless Cloning"]
+        ToneMatch --> MediaPipeSeg["MediaPipe Selfie Segmentation<br/>Extract Head, Hair & Neck Alpha Mask"]
+        MediaPipeSeg --> Gaussian["Gaussian Edge Blur Smoothing<br/>Kernel Size = 45x45"]
+        Gaussian --> Poisson["OpenCV Poisson Image Editing<br/>cv2.seamlessClone NORMAL_CLONE"]
+        TargetBox --> Poisson
+        Poisson --> Sharpen["Unsharp Mask Grain Harmonization"]
     end
 
-    Sharpen --> Result[Synthesized Try-On Output\n(Base64 Data URI + Fit Analytics)]
+    Sharpen --> Result["Synthesized Try-On Output<br/>(Base64 Data URI + Fit Analytics)"]
 ```
 
 ---
@@ -93,12 +96,12 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    Catalog[Garment Catalog Dataset] --> ExtractText[Feature Extraction\nCategory, Style Tags, Color Palette]
-    ExtractText --> TFIDF[Scikit-Learn TF-IDF Vectorizer\n'TfidfVectorizer']
-    UserProfile[User Style Preferences / Archetype Query] --> TFIDF
-    TFIDF --> Cosine[Cosine Similarity Calculation\n'cosine_similarity']
-    Cosine --> Rank[Rank Matches & Compatibility Scores]
-    Rank --> Recommendations[Personalized Style Recommendations]
+    Catalog["Garment Catalog Dataset"] --> ExtractText["Feature Extraction<br/>Category, Style Tags, Color Palette"]
+    ExtractText --> TFIDF["Scikit-Learn TF-IDF Vectorizer<br/>TfidfVectorizer"]
+    UserProfile["User Style Preferences / Query"] --> TFIDF
+    TFIDF --> Cosine["Cosine Similarity Calculation<br/>cosine_similarity"]
+    Cosine --> Rank["Rank Matches & Compatibility Scores"]
+    Rank --> Recommendations["Personalized Style Recommendations"]
 ```
 
 ---
